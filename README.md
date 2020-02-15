@@ -11,26 +11,27 @@ These instructions assume:
 Download the plugin to your preferred location (further referred to as `$PLUGIN_SVGDOTJS`)
 
 ```bash
-git pull https://github.com/grsjst/plugin_svgdotjs.git
+git clone https://github.com/grsjst/plugin_svgdotjs.git
 ```
 
 Download the svgdot.js libraries and plugins to ./js/node_modules (using `yarn` it will directly download in the correct dir)
 
 ```bash
+cd $PLUGIN_SVGDOTJS
 yarn add @svgdotjs/svg.js @svgdotjs/svg.panzoom.js @svgdotjs/svg.filter.js 
 ```
 
 Create a symbolic link from `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` to `$SWISH_DIR/config-available`
 ```bash
-cd $PLUGIN_SVGDOTJS
-ln -s ./plugin_svgdotjs  $SWISH_DIR/config-available/.
+cd $SWISH_DIR/config-enabled
+ln -s $PLUGIN_SVGDOTJS/plugin_svgdotjs.pl .
 ```
 
 Enable the plugin in SWISH by making the plugin available in `config-enabled` (create if if it doesn't exist)
 
 ```bash
 cd $SWISH_DIR/config-enabled
-ln -s ../config-available/plugin_svgdotjs .
+ln -s ../config-available/plugin_svgdotjs.pl .
 ```
 
 Then relaunch SWISH (or type `make` in swipl console)
