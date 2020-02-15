@@ -11,25 +11,25 @@ These instructions assume:
 Download the plugin to your preferred location (further referred to as `$PLUGIN_SVGDOTJS`)
 
 ```bash
-git pull xxx
+git pull https://github.com/grsjst/plugin_svgdotjs.git
 ```
 
-Download the svgdot.js libraries and plugins to ./js/node_modules (using yarn it will directly download them in correct dir)
+Download the svgdot.js libraries and plugins to ./js/node_modules (using `yarn` it will directly download in the correct dir)
 
 ```bash
 yarn add @svgdotjs/svg.js @svgdotjs/svg.panzoom.js @svgdotjs/svg.filter.js 
 ```
 
-Create a symbolic link from `$PLUGIN_SVGDOTJS\plugin_svgdotjs.pl` to `$SWISH_DIR\config-available`
+Create a symbolic link from `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` to `$SWISH_DIR/config-available`
 ```bash
 cd $PLUGIN_SVGDOTJS
-ln -s ./plugin_svgdotjs  $SWISH_DIR\\config-available\\.
+ln -s ./plugin_svgdotjs  $SWISH_DIR/config-available/.
 ```
 
 Enable the plugin in SWISH by making the plugin available in `config-enabled` (create if if it doesn't exist)
 
 ```bash
-cd $SWISH_DIR\\config-enabled
+cd $SWISH_DIR/config-enabled
 ln -s ../config-available/plugin_svgdotjs .
 ```
 
@@ -45,5 +45,5 @@ In your SWISH programme add the directive:
 
 ## Examples
 
-Some examples are available in `$PLUGIN_SVGDOTJS\examples` that you need to copy to your SWISH programme
+Some examples are available in `$PLUGIN_SVGDOTJS/examples` that you need to copy to your SWISH programme
 
