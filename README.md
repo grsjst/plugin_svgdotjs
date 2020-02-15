@@ -27,7 +27,7 @@ cd $SWISH_DIR/config-enabled
 ln -s $PLUGIN_SVGDOTJS/plugin_svgdotjs.pl .
 ```
 
-Enable the plugin in SWISH by making the plugin available in `config-enabled` (create if if it doesn't exist)
+Enable the plugin in SWISH by making the plugin available in `config-enabled` (create if it doesn't exist)
 
 ```bash
 cd $SWISH_DIR/config-enabled
