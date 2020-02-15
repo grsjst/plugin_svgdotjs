@@ -37,9 +37,9 @@ term_rendering(Shapes, _Vars, Options) -->
 		DefaultOptions = _{x:0,y:0,width:300, height:300, transform:""},
 		is_list(Shapes),
 		forall(member(Shape,Shapes),(is_dict(Shape,Type),member(Type,Types))),!,
-		debug(svgdotjs,"use svgdotjs renderer",[]),
+		% debug(svgdotjs,"use svgdotjs renderer",[]),
 		to_svgdotjs(Shapes,ShapeSpecs),
-		debug(svgdotjs,"specs:~p",[ShapeSpecs]),
+		% debug(svgdotjs,"specs:~p",[ShapeSpecs]),
 		dict_options(DictOptions,Options),
 		NOptions = DefaultOptions.put(DictOptions),
 		gensym(canvas,Id), % for debugging
@@ -56,7 +56,7 @@ term_rendering(Shapes, _Vars, Options) -->
   	//console.log("from svgdotjs.pl");
   	
     var div = $.ajaxScript.parent().find("div")[0];
-    require(['svgdotjs_plugin/svgdotjs_plugin'], function(canvas_factory) {
+    require(['plugin_svgdotjs/plugin_svg'], function(canvas_factory) {
     	var canvas = canvas_factory.create(div,NOptions);
     	canvas.add_shapes(ShapeSpecs);
 	    });

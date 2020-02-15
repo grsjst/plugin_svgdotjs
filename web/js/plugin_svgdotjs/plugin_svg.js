@@ -1,6 +1,6 @@
 requirejs.config({
     urlArgs: "ts="+new Date().getTime(),  /* prevent caching during development */
-    baseUrl: '/js/svgdotjs_plugin/',
+    baseUrl: '/js/plugin_svgdotjs/',
     paths: {
         svgjs: '../../node_modules/@svgdotjs/svg.js/dist/svg',
         svgjs_filter: '../../node_modules/@svgdotjs/svg.filter.js/dist/svg.filter',
@@ -32,7 +32,7 @@ requirejs.config({
 define(
 
     //The array of dependencies
-    ["jquery","svgdotjs_canvas","laconic"],
+    ["jquery","canvas_svg","laconic"],
 
     //The function to execute when all dependencies have loaded. The
     //arguments to this function are the array of dependencies mentioned
@@ -45,7 +45,7 @@ define(
             create: function(element, options) {
                 var id = $(element).attr("id");
                 console.log(`Create canvas #${id}`);
-                console.log(options);
+                //console.log(options);
 
                 var x = options.x != undefined ? options.x : 0;
                 var y = options.y != undefined ? options.y : 0;

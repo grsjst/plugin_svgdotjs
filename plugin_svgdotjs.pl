@@ -28,13 +28,14 @@
 
 :- module(plugin_svgdotjs,[]).
 
-/** <module> Provide SVG.js as a plugin
+/** <module> Plugin to provides SVG.js as a SWISH renderer
 
 */
-
 
 user:file_search_path(plugin_svgdotjs, '../plugin_svgdotjs/').  % set this to the directory where plugin_svgdotjs is installed 
 user:file_search_path(render, plugin_svgdotjs(render)).
 user:file_search_path(swish_web, plugin_svgdotjs(web)). 
 
-:- use_module(plugin_svgdotjs('render/svgdotjs.pl')).
+:- absolute_file_name(plugin_svgdotjs(web),F),writeln(F).
+
+:- use_module(render('svgdotjs.pl')).
