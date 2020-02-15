@@ -1,0 +1,4 @@
+package.json
+plugin_svgdotjs.sublime-workspace
+web/node_modules/*
+yarn.lock
