@@ -21,7 +21,14 @@ cd $PLUGIN_SVGDOTJS
 yarn add @svgdotjs/svg.js @svgdotjs/svg.panzoom.js @svgdotjs/svg.filter.js 
 ```
 
-Create a symbolic link from `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` to `$SWISH_DIR/config-available`
+Edit `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` and edit the following line to set `$PLUGIN_SVGDOTJS` 
+
+
+```swipl
+user:file_search_path(plugin_svgdotjs, $PLUGIN_SVGDOTJS)	% $PLUGIN_SVGDOTJS should be set to the root of PLUGIN_SVGDOTJS
+```
+
+Create a symbolic link (or copy) from `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` to `$SWISH_DIR/config-available`
 ```bash
 cd $SWISH_DIR/config-enabled
 ln -s $PLUGIN_SVGDOTJS/plugin_svgdotjs.pl .
@@ -44,7 +51,40 @@ In your SWISH programme add the directive:
 :- use_rendering(svgdotjs).   % creates a default canvas 300x300 (see Options for more details)
 ```
 
+As an example, run the following query to render a rectangle:
+
+```swipl
+X = [rect{x:10,y:10,width:100,height:100}].
+```
+
+The PLUGIN_SVGDOTJS renderer accepts a List of Dicts representing basic SVG shapes. Currently supported are:
+- group,
+- rect,
+- circle,
+- ellipse,
+- line,
+- polyline,
+- path,
+- text,
+- textPath,
+- image
+
+See the SVG reference for the attributes supported (see https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Basic_Shapes)
+
+The `d` attribute (path and textPath) used to denote a PathString (e.g. `"M20,230 Q40,205 50,230 T90,230"`) also accepts a more Prolog friendly format (e.g `['M'20,230,'Q',40,205,50,230,'T',90,230]`)
+
+Similarily for the `transform` attribute (see https://svgjs.com/docs/3.0/manipulating/#transforming) 
+
 ## Examples
 
 Some examples are available in `$PLUGIN_SVGDOTJS/examples` that you need to copy to your SWISH programme
+
+## Files
+
+```
+plugin_svgdotjs.pl - loads the svgdotjs renderer in SWISH`
+render/svgdotjs.pl - the SVGDOTJS renderer
+web/js/plugin_svgdotjs/plugin_svg.js - sets requirejs paths, and adds interaction elements (input boxes) to the SWISH results pane
+web/js/plugin_svgdotjs/canvas_svg.js - object that is returned to SVGDOTJS renderer
+```
 
