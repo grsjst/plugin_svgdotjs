@@ -25,7 +25,8 @@ Edit `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` and edit the following line to set `$
 
 
 ```swipl
-user:file_search_path(plugin_svgdotjs, $PLUGIN_SVGDOTJS)	% $PLUGIN_SVGDOTJS should be set to the root of PLUGIN_SVGDOTJS
+% $PLUGIN_SVGDOTJS should be set to the root of PLUGIN_SVGDOTJS
+user:file_search_path(plugin_svgdotjs, $PLUGIN_SVGDOTJS)
 ```
 
 Create a symbolic link (or copy) from `$PLUGIN_SVGDOTJS/plugin_svgdotjs.pl` to `$SWISH_DIR/config-available`
