@@ -1,4 +1,4 @@
-# A SWISH Plugin for SVG.js (plugin_svgdotjs)
+# A SVG.js Plugin for SWISH (plugin_svgdotjs)
 
 Plugin SVG.js is a SWISH plugin (https://github.com/SWI-Prolog/SWISH) to render SVG using SVG.js (https://svgjs.com/) 
 
