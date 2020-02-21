@@ -9,7 +9,7 @@ define(
     function ($, SVG) {
         //console.log("from svgjs_canvas.js");
 
-        var r_canvas_constructor = function(element,x,y,width,height,transform) {
+        var r_canvas_constructor = function(element,x,y,width,height,transform,n_shapes) {
             //console.log("from r_canvas_constructor");
 
             var paper = SVG().addTo(element).size("100%",height);
@@ -25,6 +25,8 @@ define(
             "transform" : transform,
             "paper" : paper,
             "rshapes" : rshapes,
+            "n_created" : 0,
+            "n_shapes" : n_shapes,
 
             create_frame() {
                 frame = this.paper.rect(this.width,this.height).attr({x:this.x,y:this.y,stroke: "SlateGray", fill:"WhiteSmoke"}).back();
@@ -39,15 +41,16 @@ define(
             },
 
             add_shapes: function(shapes) {
-                
-                for(i=0; i < shapes.length; i++) {
-                    var rshape = this.create_rshape(shapes[i]);
-                    this.rshapes.add(rshape);
-                }
-                this.apply_transform(this.transform);
+                var r_shapes = [];
+                shapes.forEach(shape => {
+                    var r_shape = this.create_rshape(shape);
+                    r_shapes.push(r_shape);
+                    this.rshapes.add(r_shape);
+                });
+                return r_shapes;
             },
 
-            create_rshape : function(shape) {
+            create_rshape : function(shape) {                
                 var rshape;
                 var t = shape.transform; // may be undefined
 
@@ -62,11 +65,8 @@ define(
                 var f_create = this.paper[shape.type];
                 if(shape.type == "group") {
                     rshape = this.paper.group();
-                    var children = shape.children;
-                    for(i=0; i < children.length; i++) {
-                        var s = this.create_rshape(children[i]);
-                        rshape.add(s);
-                    }
+                    var children_rshapes = this.add_shapes(shape.children);
+                    children_rshapes.forEach(child => rshape.add(child));
                     rshape.attr(shape);
                 } else if(shape.type == "text") { 
                     rshape = this.paper.text(shape.text).attr(shape);    // text contents cannot be set using attr
@@ -82,6 +82,9 @@ define(
                 if(t != undefined) {
                     rshape = rshape.transform(t);
                 }
+                this.n_created += 1;
+                console.log(`Created ${(shape.id != undefined ? shape.id : "")} (${shape.type}) #${this.n_created}/${this.n_shapes} shapes`);
+
                 return rshape;
             },
 
@@ -115,8 +118,13 @@ define(
             },
 
             enable_tooltip : function(r_canvas, rshape) {
-                //console.log(`add tip for ${rshape}`);
-                var glow = r_canvas.paper.use(rshape).attr({opacity:0,"stroke-width":3}).transform(r_canvas.transform);
+                //console.log(`add tip for ${rshape} ${r_canvas.id}`);
+                var glow = rshape.clone();
+                r_canvas.paper.add(glow);
+                var sw = rshape.attr("stroke-width") + 2;
+                glow.attr({opacity:0,"stroke-width":sw});
+                glow.front();
+                glow.transform(r_canvas.transform);
                 $(rshape).data("glow",glow); // to be able to remove the handler
 
                 var msg = rshape.attr("tooltip");

@@ -45,7 +45,7 @@ define(
             create: function(element, options) {
                 var id = $(element).attr("id");
                 console.log(`Create canvas #${id}`);
-                //console.log(options);
+                console.log(options);
 
                 var x = options.x != undefined ? options.x : 0;
                 var y = options.y != undefined ? options.y : 0;
@@ -53,9 +53,11 @@ define(
                 var height = options.height != undefined ? options.height : 300;
                 var frame = options.frame != undefined ? options.x : 0;
                 var transform = options.transform != undefined ? options.transform : "";
+                var n_shapes = options.n_shapes != undefined ? options.n_shapes : 0;
 
-                var r_canvas_obj = new r_canvas(element,x,y,width,height,transform); 
+                var r_canvas_obj = new r_canvas(element,x,y,width,height,transform,n_shapes); 
                 r_canvas_obj.create_frame();
+                r_canvas_obj.apply_transform(transform);
                 
                 var div_controls = $.el.div({class : "canvas-controls"});
                 this.create_panzoom_control(div_controls, r_canvas_obj);
