@@ -64,6 +64,7 @@ The PLUGIN_SVGDOTJS renderer accepts a List of Dicts representing basic SVG shap
 - ellipse,
 - line,
 - polyline,
+- polygon,
 - path,
 - text,
 - textPath,
@@ -77,7 +78,7 @@ Similarily for the `transform` attribute (see https://svgjs.com/docs/3.0/manipul
 
 ## Examples
 
-Some examples are available in `$PLUGIN_SVGDOTJS/examples` that you need to copy to your SWISH programme
+Some basic examples are available in `$PLUGIN_SVGDOTJS/examples` that you need to copy to your SWISH programme. `$PLUGIN_SVGDOTJS/util` contains a utility to convert an SVG file to a Prolog friendly version.
 
 ## Files
 
