@@ -7,7 +7,9 @@
 :- use_module(library(http/js_write)).
 :- use_module(swish(lib/render)).
 :- use_module(library(dcg/basics)).
+
 :- use_module(library(debug)).
+
 
 :- debug(svgdotjs).
 :- register_renderer(svgdotjs, "Render shapes in SVG using SVG.js").
@@ -32,18 +34,18 @@ Renders shapes (rect, cirlce, path, ...) using SVG.js
 %
 term_rendering(Shapes, _Vars, Options) -->
 	{ 
-		% debug(svgdotjs,"try svgdotjs renderer",[]),
-		Types = [group,rect,circle,ellipse,line,polyline,path,text,textPath,image],
+		%debug(svgdotjs,"try svgdotjs renderer",[]),
+		Types = [group,rect,circle,ellipse,line,polyline,polygon,path,text,textPath,image],
 		DefaultOptions = _{x:0,y:0,width:300, height:300, transform:""},
 		is_list(Shapes),
 		forall(member(Shape,Shapes),(is_dict(Shape,Type),member(Type,Types))),!,
-		% debug(svgdotjs,"use svgdotjs renderer",[]),
+		debug(svgdotjs,"use svgdotjs renderer",[]),
 		to_svgdotjs(Shapes,ShapeSpecs),
-		% debug(svgdotjs,"specs:~p",[ShapeSpecs]),
+		debug(svgdotjs,"specs:~p",[ShapeSpecs]),
 		dict_options(DictOptions,Options),
-		NOptions = DefaultOptions.put(DictOptions),
+		NOptions = DefaultOptions.put(DictOptions).put(n_shapes,N),
 		gensym(canvas,Id), % for debugging
-		length(ShapeSpecs,N),
+		count_shapes(ShapeSpecs,N),
 		debug(svgdotjs,"creating  ~w, containing #~w shapes, options: ~w",[Id,N,NOptions])
 	},
 		html(div([ class('render-svg-bbox'),
@@ -91,13 +93,26 @@ post_process_shape(Shape,NShape) :-
 	is_dict(Shape,Type),
 	NShape = Shape.put(Default).
 
+count_shapes([],0).
+count_shapes([Shape|Shapes],N) :-
+	is_dict(Shape,Type),
+	Type = group,!,
+	count_shapes(Shape.children,L),
+	count_shapes(Shapes,M),
+	N is L + M + 1.
+
+count_shapes([_Shape|Shapes],N) :-
+	count_shapes(Shapes,M),
+	N is M + 1.
 
 shape_message(Shape,Mesg) :-
 	phrase(shape_msg(Shape),Codes),
 	string_codes(Mesg,Codes).
 
-shape_msg(Shape) --> msg_with_title(Shape),!.
-shape_msg(Shape) --> msg(Shape),!.
+shape_msg(Shape) --> id(Shape),msg_with_title(Shape),!.
+shape_msg(Shape) --> id(Shape),msg(Shape),!.
+id(Shape) --> {Id = Shape.get(id),format(string(StrId),"~w : ",[Id])},!,StrId.
+id(_) --> "".
 msg_with_title(Shape) --> {Title = Shape.get(title)},msg(Shape)," - ",Title.
 msg(Group) --> {is_dict(Group,group),length(Group.children,N), format(string(AttrStr),"group(#~w children)",[N])},AttrStr.
 msg(Rect) --> {is_dict(Rect,rect)},"rect","(", xy_coord(Rect.x,Rect.y),",",attrs([Rect.width,Rect.height]), ")".
@@ -105,9 +120,10 @@ msg(Circle) --> {is_dict(Circle,circle)},"circle","(", xy_coord(Circle.cx,Circle
 msg(Ellipse) --> {is_dict(Ellipse,ellipse)},"ellipse","(", xy_coord(Ellipse.cx,Ellipse.cy),",",attrs([Ellipse.rx,Ellipse.ry]), ")".
 msg(Line) --> {is_dict(Line,line)},"line","(", "[",xy_coords([Line.x1,Line.y1,Line.x2,Line.y2]),")".
 msg(PolyLine) --> {is_dict(PolyLine,polyline)},"polyline","(", xy_coords(PolyLine.points),")".
+msg(Polygon) --> {is_dict(Polygon,polygon)},"polygon","(", xy_coords(Polygon.points),")".
 msg(Path) --> {is_dict(Path,path),format(string(AttrStr),"path(~w)",[Path.d])},AttrStr.
 msg(Text) --> {is_dict(Text,text),string_length(Text.text,N),format(string(TxtStr),"#~w chars",[N])},"text","(",xy_coord(Text.x,Text.y)," - ",TxtStr,")".
-msg(TextPath) --> {is_dict(TextPath,textPath),string_length(TextPath.text,N),format(string(TxtStr),"#~w chars",[N])},"textPath","(",xy_coord(TextPath.x,TextPath.y)," - ",TxtStr,")".
+msg(TextPath) --> {is_dict(TextPath,textPath),string_length(TextPath.text,N),format(string(TxtStr),"textPath(~w - #~w chars)",[TextPath.d,N])},TxtStr.
 msg(Image) --> {is_dict(Image,image)},"image","(", xy_coord(Image.x,Image.y),",",attrs([Image.width,Image.height]), ")".
 msg(UnknownShape) --> {is_dict(UnknownShape,Type), format(string(Msg),"~w isn't supported yet",[Type])},Msg.
 xy_coords([X,Y]) --> xy_coord(X,Y).
@@ -117,25 +133,6 @@ attrs([]) --> "".
 attrs([Attr]) --> attr(Attr).
 attrs([Attr|Attrs]) --> attr(Attr), ",", attrs(Attrs).
 attr(Attr) --> {format(string(AttrStr),"~w",[Attr])},AttrStr.
-
-% "M490.667,0H21.333C9.551,0,0,9.551,0,21.333v469.333C0,502.449,9.551,512,21.333,512h469.333c11.782,0,21.333-9.551,21.333-21.333V21.333C512,9.551,502.449,0,490.667,0z M469.333,469.333H42.667V42.667h426.667V469.333z"
-parse_path(String,Path) :-
-	atom_codes(String,Codes),
-    phrase(path(Path),Codes,[]),!.
-
-path([]) --> "".
-path(Segements) --> segment(Segment),path(Segements0),{append(Segment,Segements0,Segements)}.
-
-segment([Cmd]) --> close(Cmd),whites.
-segment([Cmd|Coords]) --> command(Cmd),coords(Coords).
-command(LetterAtom) --> [Letter],{code_type(Letter, alpha),!,atom_codes(LetterAtom,[Letter])}. 
-coords([Number]) --> number(Number).
-coords([Number|Numbers]) --> number(Number),sep,coords(Numbers).
-close(z) --> "z".
-close(z) --> "Z".
-sep --> whites.
-sep --> whites,",",whites.
-
 
 
 
